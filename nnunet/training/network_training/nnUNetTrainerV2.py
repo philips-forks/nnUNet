@@ -63,7 +63,8 @@ class nnUNetTrainerV2(nnUNetTrainer):
         :return:
         """
         if not self.was_initialized:
-            maybe_mkdir_p(self.output_folder)
+            if training:
+                maybe_mkdir_p(self.output_folder)
 
             if force_load_plans or (self.plans is None):
                 self.load_plans_file()

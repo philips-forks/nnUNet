@@ -313,7 +313,8 @@ class NetworkTrainer(object):
         return self.load_checkpoint(filename, train=train)
 
     def load_checkpoint(self, fname, train=True):
-        self.print_to_log_file("loading checkpoint", fname, "train=", train)
+        if train:
+            self.print_to_log_file("loading checkpoint", fname, "train=", train)
         if not self.was_initialized:
             self.initialize(train)
         # saved_model = torch.load(fname, map_location=torch.device('cuda', torch.cuda.current_device()))
