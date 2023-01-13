@@ -16,7 +16,7 @@ class nnUNet(nn.Module):
         Parameters
         ----------
         fold_dir : str
-            Path to `nnUNetTrainerV2__nnUNetPlansv2.1/fold_i/all` dir
+            Path to `nnUNetTrainerV2__nnUNetPlansv2.1/fold_i` dir
         """
         super().__init__()
         self.model = self._load_best_model_for_inference(pretrained_dir, ckp_name)
