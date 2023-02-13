@@ -76,12 +76,13 @@ class nnUNet(nn.Module):
         with self.predict_state():
             traced_model = torch.jit.trace(self.model, sample_input)
             traced_model.save(savepath)
-    
+
     def export_onnx(
         self,
         savepath: str = "nnunet_best.onnx",
         sample_input: torch.Tensor = torch.rand(1, 1, 512, 512)
     ):
+        dynamic_axes = {'input' : {0: 'batch_size'}, 'output' : {0: 'batch_size'}}
         with self.predict_state():
             traced_model = torch.jit.trace(self.model, sample_input)
             torch.onnx.export(
@@ -90,6 +91,7 @@ class nnUNet(nn.Module):
                 savepath,
                 input_names=["image"],
                 output_names=["mask"],
+                dynamic_axes=dynamic_axes,
             )
 
 
