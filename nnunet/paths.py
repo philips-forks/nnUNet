@@ -36,7 +36,7 @@ if base is not None:
     maybe_mkdir_p(nnUNet_raw_data)
     maybe_mkdir_p(nnUNet_cropped_data)
 else:
-    if not bool(os.environ["NNUNET_LOADER_USED"]):
+    if not bool(os.getenv("NNUNET_LOADER_USED", False)):
         print("nnUNet_raw_data_base is not defined and nnU-Net can only be used on data for which preprocessed files "
             "are already present on your system. nnU-Net cannot be used for experiment planning and preprocessing like "
             "this. If this is not intended, please read documentation/setting_up_paths.md for information on how to set this up properly.")
@@ -45,7 +45,7 @@ else:
 if preprocessing_output_dir is not None:
     maybe_mkdir_p(preprocessing_output_dir)
 else:
-    if not bool(os.environ["NNUNET_LOADER_USED"]):
+    if not bool(os.getenv("NNUNET_LOADER_USED", False)):
         print("nnUNet_preprocessed is not defined and nnU-Net can not be used for preprocessing "
             "or training. If this is not intended, please read documentation/setting_up_paths.md for information on how to set this up.")
     preprocessing_output_dir = None
@@ -54,7 +54,7 @@ if network_training_output_dir_base is not None:
     network_training_output_dir = join(network_training_output_dir_base, my_output_identifier)
     maybe_mkdir_p(network_training_output_dir)
 else:
-    if not bool(os.environ["NNUNET_LOADER_USED"]):
+    if not bool(os.getenv("NNUNET_LOADER_USED", False)):
         print("RESULTS_FOLDER is not defined and nnU-Net cannot be used for training or "
             "inference. If this is not intended behavior, please read documentation/setting_up_paths.md for information on how to set this "
             "up.")
