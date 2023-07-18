@@ -1,3 +1,4 @@
+import os
 import torch
 import torch.nn as nn
 from pathlib import Path
@@ -17,26 +18,29 @@ class nnUNet(nn.Module):
         super().__init__()
         nnunet_trained_model_dir = Path(nnunet_trained_model_dir)
         model_dir = nnunet_trained_model_dir / "nnUNetTrainer__nnUNetPlans__2d"
+        _compile = os.getenv("nnUNet_compile", '0')
+        os.environ["nnUNet_compile"] = '0'
         self.predictor = nnUNetPredictor(device=torch.device("cpu"), perform_everything_on_gpu=False)
         self.predictor.initialize_from_trained_model_folder(model_dir, (fold,), checkpoint_name=checkpoint_name)
         self.predictor.network.load_state_dict(self.predictor.list_of_parameters[0])
         self.model = self.predictor.network
         self.name = f"{nnunet_trained_model_dir.stem}_fold{fold}_{Path(checkpoint_name).stem}"
+        os.environ["nnUNet_compile"] = _compile
 
     def forward(self, x: torch.Tensor):
         return self.model(x)
 
     @contextmanager
     def predict_state(self):
-        initial_ds = self.model.encoder.deep_supervision
+        initial_ds = self.model.decoder.deep_supervision
         training_state = self.model.training
         try:
-            self.model.training(False)
-            self.model.encoder.deep_supervision = False
+            self.model.train(mode=False)
+            self.model.decoder.deep_supervision = False
             yield self
         finally:
-            self.model.encoder.deep_supervision = initial_ds
-            self.model.training(training_state)
+            self.model.decoder.deep_supervision = initial_ds
+            self.model.train(mode=training_state)
     
     def export_torchscript(
         self,
@@ -146,6 +150,11 @@ class UNet(nn.Module):
 
 
 if __name__ == "__main__":
+
+    # Example of export trained model to ONNX.
+    nnunet = nnUNet("nnUNet_results/Dataset001_Task", fold='all')
+    nnunet.export_onnx("nnUNet_results/Dataset001_Task")
+
     from nnunetv2.imageio.nibabel_reader_writer import NibabelIO
 
     # Raw Inference example
